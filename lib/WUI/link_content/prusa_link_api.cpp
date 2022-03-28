@@ -31,6 +31,7 @@ namespace {
     GET_WRAPPER(get_printer);
     GET_WRAPPER(get_version);
     GET_WRAPPER(get_job);
+    GET_WRAPPER(get_metrics);
 #undef GET_WRAPPER
 
     optional<string_view> remove_prefix(string_view input, string_view prefix) {
@@ -184,6 +185,8 @@ optional<ConnectionState> PrusaLinkApi::accept(const RequestParser &parser) cons
         }
     } else if (suffix == "printer") {
         return get_only(GenOnce(handler_get_printer, ContentType::ApplicationJson, parser.can_keep_alive()));
+    } else if (suffix == "metrics") {
+        return get_only(GenOnce(handler_get_metrics, ContentType::ApplicationJson, parser.can_keep_alive()));
     } else {
         return StatusPage(Status::NotFound, parser.can_keep_alive());
     }

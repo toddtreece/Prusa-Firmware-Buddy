@@ -254,3 +254,49 @@ void get_job(char *data, const uint32_t buf_len) {
             state);
     }
 }
+
+void get_metrics(char *data, const uint32_t buf_len) {
+    marlin_vars_t *vars = marlin_vars();
+
+    const char *filename = vars->media_LFN;
+    JSONIFY_STR(filename);
+
+    snprintf(data, buf_len,
+        "# TYPE completed gauge\n"
+        "completed{file=\"%s\"} %.1f\n"
+        "# TYPE temp_bed gauge\n"
+        "temp_bed %.1f\n"
+        "# TYPE temp_nozzle gauge\n"
+        "temp_nozzle %.1f\n"
+        "# TYPE print_speed gauge\n"
+        "print_speed %d\n"
+        "# TYPE pos_x_mm gauge\n"
+        "pos_x_mm %.1f\n"
+        "# TYPE pos_y_mm gauge\n"
+        "pos_y_mm %.1f\n"
+        "# TYPE pos_z_mm gauge\n"
+        "pos_z_mm %.1f\n"
+        "# TYPE pos_e_mm gauge\n"
+        "pos_e_mm %.1f\n"
+        "# TYPE nozzle_actual_temp gauge\n"
+        "nozzle_actual_temp %.1f\n"
+        "# TYPE nozzle_target_temp gauge\n"
+        "nozzle_target_temp %.1f\n"
+        "# TYPE bed_actual_temp gauge\n"
+        "bed_actual_temp %.1f\n"
+        "# TYPE bed_target_temp gauge\n"
+        "bed_target_temp %.1f\n",
+        filename_escaped,
+        ((double)vars->sd_percent_done / 100.0),
+        (double)vars->temp_bed,
+        (double)vars->temp_nozzle,
+        (int)vars->print_speed,
+        (double)vars->pos[0], // XYZE, mm
+        (double)vars->pos[1],
+        (double)vars->pos[2],
+        (double)vars->pos[3],
+        (double)vars->temp_nozzle,
+        (double)vars->target_nozzle,
+        (double)vars->temp_bed,
+        (double)vars->target_bed);
+}
