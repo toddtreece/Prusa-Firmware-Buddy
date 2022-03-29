@@ -155,7 +155,7 @@ MI_SELFTEST_RESULT::MI_SELFTEST_RESULT()
 
 void MI_SELFTEST_RESULT::click(IWindowMenu & /*window_menu*/) {
     SelftestResultEEprom_t result;
-    result.ui32 = variant8_get_ui32(eeprom_get_var(EEVAR_SELFTEST_RESULT));
+    result.ui32 = eeprom_get_ui32(EEVAR_SELFTEST_RESULT);
     DialogSelftestResult::Show(result);
 }
 
@@ -417,7 +417,7 @@ void MI_TIMEOUT::OnChange(size_t old_index) {
     } else {
         Screens::Access()->DisableMenuTimeout();
     }
-    eeprom_set_var(EEVAR_MENU_TIMEOUT, variant8_bool(uint8_t(Screens::Access()->GetMenuTimeout())));
+    eeprom_set_bool(EEVAR_MENU_TIMEOUT, uint8_t(Screens::Access()->GetMenuTimeout()));
 }
 
 /*****************************************************************************/
@@ -469,13 +469,13 @@ void MI_SOUND_VOLUME::OnClick() {
 /*****************************************************************************/
 //MI_SORT_FILES
 MI_SORT_FILES::MI_SORT_FILES()
-    : WI_SWITCH_t<2>(variant8_get_ui8(eeprom_get_var(EEVAR_FILE_SORT)), _(label), 0, is_enabled_t::yes, is_hidden_t::no, _(str_time), _(str_name)) {}
+    : WI_SWITCH_t<2>(eeprom_get_ui8(EEVAR_FILE_SORT), _(label), 0, is_enabled_t::yes, is_hidden_t::no, _(str_time), _(str_name)) {}
 void MI_SORT_FILES::OnChange(size_t old_index) {
     if (old_index == WF_SORT_BY_TIME) { // default option - was sorted by time of change, set by name
-        eeprom_set_var(EEVAR_FILE_SORT, variant8_ui8((uint8_t)WF_SORT_BY_NAME));
+        eeprom_set_ui8(EEVAR_FILE_SORT, (uint8_t)WF_SORT_BY_NAME);
         screen_filebrowser_sort = WF_SORT_BY_NAME;
     } else if (old_index == WF_SORT_BY_NAME) { // was sorted by name, set by time
-        eeprom_set_var(EEVAR_FILE_SORT, variant8_ui8((uint8_t)WF_SORT_BY_TIME));
+        eeprom_set_ui8(EEVAR_FILE_SORT, (uint8_t)WF_SORT_BY_TIME);
         screen_filebrowser_sort = WF_SORT_BY_TIME;
     }
 }
@@ -483,11 +483,11 @@ void MI_SORT_FILES::OnChange(size_t old_index) {
 /*****************************************************************************/
 //MI_TIMEZONE
 MI_TIMEZONE::MI_TIMEZONE()
-    : WiSpinInt(variant8_get_i8(eeprom_get_var(EEVAR_TIMEZONE)), SpinCnf::timezone_range, _(label), 0, is_enabled_t::yes, is_hidden_t::no) {}
+    : WiSpinInt(eeprom_get_i8(EEVAR_TIMEZONE), SpinCnf::timezone_range, _(label), 0, is_enabled_t::yes, is_hidden_t::no) {}
 void MI_TIMEZONE::OnClick() {
     int8_t timezone = GetVal();
-    int8_t last_timezone = variant8_get_i8(eeprom_get_var(EEVAR_TIMEZONE));
-    eeprom_set_var(EEVAR_TIMEZONE, variant8_i8(timezone));
+    int8_t last_timezone = eeprom_get_i8(EEVAR_TIMEZONE);
+    eeprom_set_i8(EEVAR_TIMEZONE, timezone);
     time_t seconds = 0;
     if ((seconds = sntp_get_system_time())) {
         sntp_set_system_time(seconds, last_timezone);
@@ -544,10 +544,10 @@ bool MI_MINDA::StateChanged() {
 /*****************************************************************************/
 //MI_FAN_CHECK
 MI_FAN_CHECK::MI_FAN_CHECK()
-    : WI_SWITCH_OFF_ON_t(variant8_get_ui8(marlin_get_var(MARLIN_VAR_FAN_CHECK_ENABLED)), _(label), 0, is_enabled_t::yes, is_hidden_t::no) {}
+    : WI_SWITCH_OFF_ON_t(marlin_get_bool(MARLIN_VAR_FAN_CHECK_ENABLED), _(label), 0, is_enabled_t::yes, is_hidden_t::no) {}
 void MI_FAN_CHECK::OnChange(size_t old_index) {
-    marlin_set_var(MARLIN_VAR_FAN_CHECK_ENABLED, variant8_bool(!old_index));
-    eeprom_set_var(EEVAR_FAN_CHECK_ENABLED, marlin_get_var(MARLIN_VAR_FAN_CHECK_ENABLED));
+    marlin_set_bool(MARLIN_VAR_FAN_CHECK_ENABLED, !old_index);
+    eeprom_set_bool(EEVAR_FAN_CHECK_ENABLED, marlin_get_bool(MARLIN_VAR_FAN_CHECK_ENABLED));
 }
 
 /*****************************************************************************/
@@ -557,10 +557,10 @@ is_hidden_t hide_autoload_item() {
 }
 
 MI_FS_AUTOLOAD::MI_FS_AUTOLOAD()
-    : WI_SWITCH_OFF_ON_t(variant8_get_bool(marlin_get_var(MARLIN_VAR_FS_AUTOLOAD_ENABLED)), _(label), 0, is_enabled_t::yes, hide_autoload_item()) {}
+    : WI_SWITCH_OFF_ON_t(marlin_get_bool(MARLIN_VAR_FS_AUTOLOAD_ENABLED), _(label), 0, is_enabled_t::yes, hide_autoload_item()) {}
 void MI_FS_AUTOLOAD::OnChange(size_t old_index) {
-    marlin_set_var(MARLIN_VAR_FS_AUTOLOAD_ENABLED, variant8_bool(!old_index));
-    eeprom_set_var(EEVAR_FS_AUTOLOAD_ENABLED, marlin_get_var(MARLIN_VAR_FS_AUTOLOAD_ENABLED));
+    marlin_set_bool(MARLIN_VAR_FS_AUTOLOAD_ENABLED, !old_index);
+    eeprom_set_bool(EEVAR_FS_AUTOLOAD_ENABLED, marlin_get_bool(MARLIN_VAR_FS_AUTOLOAD_ENABLED));
 }
 MI_ODOMETER_DIST::MI_ODOMETER_DIST(string_view_utf8 label, uint16_t id_icon, is_enabled_t enabled, is_hidden_t hidden, float initVal)
     : WI_FORMATABLE_LABEL_t<float>(label, id_icon, enabled, hidden, initVal, [&](char *buffer) {

@@ -4,9 +4,23 @@ function(add_resource source_path install_path)
   lfs_image_add_file(resources-image "${source_path}" "${install_path}")
 endfunction()
 
+function(add_gzip_resource source_path install_path)
+  set(gzip_file_path "${CMAKE_CURRENT_BINARY_DIR}/gzipped${install_path}")
+  gzip_file("${source_path}" "${gzip_file_path}")
+  add_resource("${gzip_file_path}" "${install_path}")
+endfunction()
+
 add_resource("esp/uart_wifi.bin" "/esp/uart_wifi.bin")
 add_resource("esp/bootloader.bin" "/esp/bootloader.bin")
 add_resource("esp/partition-table.bin" "/esp/partition-table.bin")
+
+add_gzip_resource(
+  "web/e5ae0f11eb9a619ec903488e77be89b8.svg" "/web/e5ae0f11eb9a619ec903488e77be89b8.svg"
+  )
+add_gzip_resource("web/favicon.ico" "/web/favicon.ico")
+add_gzip_resource("web/index.html" "/web/index.html")
+add_gzip_resource("web/main.47fcf7209ede7bfac5e3.css" "/web/main.47fcf7209ede7bfac5e3.css")
+add_gzip_resource("web/main.9efec8b5a6755f36580c.js" "/web/main.9efec8b5a6755f36580c.js")
 
 # generate header with hash
 set(RESOURCES_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
